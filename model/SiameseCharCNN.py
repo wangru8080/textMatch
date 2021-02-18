@@ -28,8 +28,8 @@ class SiameseCharCNN(nn.Module):
             for kernel_size in self.args.kernel_size_list   
         ])
         self.gap = nn.AdaptiveAvgPool1d(1) 
-        self.cos_sim_layer = nn.CosineSimilarity(dim=-1)
-        self.euclidean_layer = EuclideanLayer(dim=-1)
+        self.cos_sim_layer = nn.CosineSimilarity(dim=-1, eps=1e-5)
+        self.euclidean_layer = EuclideanLayer(dim=-1, eps=1e-5)
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear((self.args.filters*2+2)*len(self.args.kernel_size_list), 32)),
