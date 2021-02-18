@@ -62,11 +62,11 @@ class SiameseCharCNN(nn.Module):
             euclidean = self.euclidean_layer(x1_cnn_feature.permute(0, 2, 1), x2_cnn_feature.permute(0, 2, 1)) # [batch, 1]
             euclidean_list.append(euclidean)
         
-        absSub_list = torch.cat(absSub_list, axis=-1)
-        mul_list = torch.cat(mul_list, axis=-1)
-        cossim_list = torch.cat(cossim_list, axis=-1)
-        euclidean_list = torch.cat(euclidean_list, axis=-1)
+        absSub_list = torch.cat(absSub_list, dim=-1)
+        mul_list = torch.cat(mul_list, dim=-1)
+        cossim_list = torch.cat(cossim_list, dim=-1)
+        euclidean_list = torch.cat(euclidean_list, dim=-1)
 
-        out = torch.cat([absSub_list, mul_list, cossim_list, euclidean_list], axis=-1)
+        out = torch.cat([absSub_list, mul_list, cossim_list, euclidean_list], dim=-1)
         out = self.fc(out)
         return out
