@@ -76,7 +76,7 @@ def Config():
                         required=False, 
                         help='how many subprocesses to use for data loading. '
                         '``0`` means that the data will be loaded in the main process')
-    parser.add_argument('--batch_size', 
+    parser.add_argument('--per_gpu_batch_size', 
                         type=int, 
                         default=128, 
                         required=False,
