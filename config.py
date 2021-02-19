@@ -149,7 +149,9 @@ def Config():
         args.n_gpu = 0
 
     if args.is_print_conf:
+        print('*************Config**************')
         for name, value in vars(args).items():
             print('%s: %s' % (name, value))
+        print('*********************************')
 
     return args
