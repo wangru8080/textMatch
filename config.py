@@ -140,12 +140,13 @@ def Config():
 
     args = parser.parse_args()
 
+    args.n_gpu = len(args.gpuid.split(','))
     if args.gpuid == '-1':
         args.use_gpu = False
+        args.n_gpu = 0
     if args.use_gpu == False:
         args.gpuid = '-1'
-    
-    args.n_gpu = len(args.gpuid.split(','))
+        args.n_gpu = 0
 
     if args.is_print_conf:
         for name, value in vars(args).items():
