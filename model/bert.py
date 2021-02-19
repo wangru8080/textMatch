@@ -18,7 +18,7 @@ class BertOrigin(nn.Module):
         super(BertOrigin, self).__init__()
         self.args = args
 
-        self.bert = BertModel.from_pretrained(args.bert_path)
+        self.bert = BertModel.from_pretrained(args.bert_path) # bert-base-chinese
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(768, 2)),
             ('dropout1', nn.Dropout(0.5)),
