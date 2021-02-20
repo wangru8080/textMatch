@@ -16,7 +16,7 @@ class BertTokenData(Dataset):
     def __init__(self, args):
         self.args = args
         
-        self.tokenizer = BertTokenizer.from_pretrained(self.args.bert_path)
+        self.tokenizer = BertTokenizer.from_pretrained(self.args.pretrained_model_path)
         self.tokenizer.padding_side='right'
 
     def _truncate_seq_pair(self, tokens_a, tokens_b, max_len):
