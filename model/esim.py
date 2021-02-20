@@ -10,7 +10,6 @@ import torch.nn as nn
 from torch.nn import functional as F 
 import numpy as np 
 from collections import OrderedDict
-torch.manual_seed(2021)
 
 class ESIM(nn.Module):
     def __init__(self, args):
