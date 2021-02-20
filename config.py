@@ -19,6 +19,12 @@ def Config():
                         default=False, 
                         required=False, 
                         help='whether to print conf info')
+    
+    parser.add_argument('--seed', 
+                        type=int, 
+                        default=2021, 
+                        required=False, 
+                        help='random seed for initialization')
 
     # data file conf
     parser.add_argument('--train_data_file', 
@@ -51,6 +57,11 @@ def Config():
                         default='utf-8', 
                         required=False, 
                         help='predict data file encoding')
+    parser.add_argument('--load_model_path', 
+                        type=str, 
+                        default='/search/odin/wangru/textMatch/save/BertOrigin/', 
+                        required=False, 
+                        help='load model')
 
     # gpu conf
     parser.add_argument('--gpuid', 
@@ -88,11 +99,11 @@ def Config():
                         help='text segment type. choose word or char')
 
     # model conf
-    parser.add_argument('--bert_path', 
+    parser.add_argument('--pretrained_model_path', 
                         type=str, 
-                        default='/search/odin/wangru/textMatch/bert-base-chinese/', 
+                        default='/search/odin/wangru/textMatch/bert_conf/bert-base-chinese/', 
                         required=False, 
-                        help='bert model&vocab path')
+                        help='The config files corresponding to the pre-trained BERT model.')
     parser.add_argument('--learning_rate', 
                         type=float, 
                         default=2e-5, 
@@ -126,15 +137,26 @@ def Config():
                         default=1, 
                         required=False, 
                         help='Number of updates steps to accumulate before performing a backward/update pass.')
-
-    parser.add_argument('--seed', 
-                        type=int, 
-                        default=2021, 
+    parser.add_argument('--max_grad_norm', 
+                        type=float, 
+                        default=1.0, 
                         required=False, 
-                        help='random seed for initialization')
+                        help='Max gradient norm.')
+
+    # output
+    parser.add_argument('--save_model_path',
+                        type=str,
+                        default='/search/odin/wangru/textMatch/save/',
+                        required=False,
+                        help='The output directory where the model checkpoints will be written.')
+    parser.add_argument('--do_save_model',
+                        type=ast.literal_eval, 
+                        default=False,
+                        required=False,
+                        help='save model or not')
 
     args = parser.parse_args()
-
+    
     args.n_gpu = len(args.gpuid.split(','))
     if args.gpuid == '-1':
         args.n_gpu = 0
