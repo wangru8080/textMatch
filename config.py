@@ -63,11 +63,6 @@ def Config():
                         default=1, 
                         required=False, 
                         help='Total number of gpu')
-    parser.add_argument('--use_gpu', 
-                        type=ast.literal_eval, 
-                        default=torch.cuda.is_available(), 
-                        required=False, 
-                        help='whether to use gpu')
     
     # data conf
     parser.add_argument('--num_workers', 
@@ -142,10 +137,6 @@ def Config():
 
     args.n_gpu = len(args.gpuid.split(','))
     if args.gpuid == '-1':
-        args.use_gpu = False
-        args.n_gpu = 0
-    if args.use_gpu == False:
-        args.gpuid = '-1'
         args.n_gpu = 0
 
     if args.is_print_conf:
