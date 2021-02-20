@@ -11,7 +11,6 @@ from torch.nn import functional as F
 import numpy as np 
 from collections import OrderedDict
 from script.MyLayers import EuclideanLayer
-torch.manual_seed(2021)
 
 class SiameseCharCNN(nn.Module):
     def __init__(self, args):
