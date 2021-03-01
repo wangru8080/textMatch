@@ -33,8 +33,7 @@ class SiameseCharCNN(nn.Module):
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear((self.args.filters*2+2)*len(self.args.kernel_size_list), 32)),
             ('dropout1', nn.Dropout(0.5)),
-            ('fc2', nn.Linear(32, self.args.num_class)),
-            ('softmax', nn.Softmax(dim=1))
+            ('fc2', nn.Linear(32, self.args.num_class))
         ]))
     
     def forward(self, x1, x2):
