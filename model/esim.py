@@ -19,21 +19,33 @@ class ESIM(nn.Module):
         self.embedding = nn.Embedding(self.args.vocab_size, self.args.embedding_size) # [batch, seq_len, embedding_size]
         self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=True, bidirectional=True) # [batch, seq_len, 128]
         self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=True, bidirectional=True)
-
+        
         self.gap = nn.AdaptiveAvgPool1d(1)
         self.gmp = nn.AdaptiveMaxPool1d(1)
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(128*8, 32)),
             ('dropout1', nn.Dropout(0.5)),
-            ('fc2', nn.Linear(32, self.args.num_class)),
-            ('softmax', nn.Softmax(dim=1))
+            ('fc2', nn.Linear(32, self.args.num_class))
         ]))
 
-    def soft_align_attention(self, x1, x2):
-        attention = torch.matmul(x1, x2.permute(0, 2, 1))
-        x1_att = F.softmax(attention, dim=-1)
-        x2_att = F.softmax(attention.permute(0, 2, 1), dim=-1)
+    def soft_align_attention(self, x1, x2, x1_mask=None, x2_mask=None):
+        attention12 = torch.matmul(x1, x2.permute(0, 2, 1))
+        attention21 = torch.matmul(x2, x1.permute(0, 2, 1))
+
+        if x1_mask != None:
+            x1_mask = 1 - x1_mask
+            x1_mask = x1_mask.unsqueeze(1)
+            x1_mask = x1_mask.float().masked_fill(x1_mask.eq(1), float('-inf'))
+            attention21 += x1_mask
+        if x2_mask != None:
+            x2_mask = 1 - x2_mask
+            x2_mask = x2_mask.unsqueeze(1)
+            x2_mask = x2_mask.float().masked_fill(x2_mask.eq(1), float('-inf'))
+            attention12 += x2_mask
+
+        x1_att = F.softmax(attention12, dim=-1)
+        x2_att = F.softmax(attention21, dim=-1)
         x1_align = torch.matmul(x1_att, x2)
         x2_align = torch.matmul(x2_att, x1)
         return x1_align, x2_align
