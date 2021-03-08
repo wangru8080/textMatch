@@ -12,11 +12,14 @@ import numpy as np
 from collections import OrderedDict
 
 class ESIM(nn.Module):
-    def __init__(self, args):
+    def __init__(self, args, is_pretrain=False, embeddings=None):
         super(ESIM, self).__init__()
         self.args = args
 
         self.embedding = nn.Embedding(self.args.vocab_size, self.args.embedding_size) # [batch, seq_len, embedding_size]
+        if is_pretrain:
+            self.embedding = nn.Embedding.from_pretrained(torch.from_numpy(embeddings), freeze=True)
+
         self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=True, bidirectional=True) # [batch, seq_len, 128]
         self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=True, bidirectional=True)
         
@@ -86,5 +89,6 @@ class ESIM(nn.Module):
         x2_rep = self.apply_multiple(x2_compose)
 
         out = torch.cat([x1_rep, x2_rep], dim=-1)
-        out = self.fc(out)
-        return out
+        logit = self.fc(out)
+        prob = F.softmax(logit, dim=1)
+        return logit, prob
