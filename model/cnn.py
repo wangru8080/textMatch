@@ -10,23 +10,16 @@ import torch.nn as nn
 from torch.nn import functional as F 
 import numpy as np 
 from collections import OrderedDict
-class EuclideanLayer(nn.Module):
-    def __init__(self, dim=1, eps=1e-8, keepdim=False):
-        super(EuclideanLayer, self).__init__()
-
-        self.dim = dim
-        self.eps = eps 
-        self.keepdim = keepdim
-
-    def forward(self, x1, x2):
-        return torch.sqrt(torch.sum(torch.square(x1 - x2), axis=self.dim, keepdim=self.keepdim) + self.eps)
 
 class SiameseCharCNN(nn.Module):
-    def __init__(self, args):
+    def __init__(self, args, is_pretrain=False, embeddings=None):
         super(SiameseCharCNN, self).__init__()
         self.args = args
 
         self.embedding = nn.Embedding(self.args.vocab_size, self.args.embedding_size) # [batch, seq_len, embedding_size]
+        if is_pretrain:
+            self.embedding = nn.Embedding.from_pretrained(torch.from_numpy(embeddings), freeze=True)
+
         self.cnn_list = nn.ModuleList([
             nn.Sequential(OrderedDict([
                 ('conv1d', nn.Conv1d(self.args.embedding_size, self.args.filters, kernel_size)),
@@ -36,8 +29,8 @@ class SiameseCharCNN(nn.Module):
             for kernel_size in self.args.kernel_size_list   
         ])
         
-        self.cos_sim_layer = nn.CosineSimilarity(dim=-1, eps=1e-5)
-        self.euclidean_layer = EuclideanLayer(dim=-1, eps=1e-5)
+        self.cos_sim_layer = CosineLayer(dim=-1)
+        self.euclidean_layer = EuclideanLayer(dim=-1)
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear((self.args.filters*2+2)*len(self.args.kernel_size_list), 32)),
@@ -75,5 +68,7 @@ class SiameseCharCNN(nn.Module):
         euclidean_list = torch.cat(euclidean_list, dim=-1)
 
         out = torch.cat([absSub_list, mul_list, cossim_list, euclidean_list], dim=-1)
-        out = self.fc(out)
-        return out
+
+        logit = self.fc(out)
+        prob = F.softmax(logit, dim=1)
+        return logit, prob
