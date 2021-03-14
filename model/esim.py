@@ -18,7 +18,7 @@ class ESIM(nn.Module):
 
         self.embedding = nn.Embedding(self.args.vocab_size, self.args.embedding_size) # [batch, seq_len, embedding_size]
         if is_pretrain:
-            self.embedding = nn.Embedding.from_pretrained(torch.from_numpy(embeddings), freeze=True)
+            self.embedding = nn.Embedding.from_pretrained(torch.from_numpy(embeddings).float(), freeze=True)
 
         self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=True, bidirectional=True) # [batch, seq_len, 128]
         self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=True, bidirectional=True)
