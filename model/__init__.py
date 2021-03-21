@@ -17,7 +17,7 @@ from .albert import (
 )
 
 from .cnn import (
-    SiameseCharCNN,
+    SiameseCNN,
     TextCNN
 )
 
