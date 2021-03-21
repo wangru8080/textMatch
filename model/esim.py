@@ -28,6 +28,7 @@ class ESIM(nn.Module):
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(128*8, 32)),
+            ('relu1', nn.ReLU(inplace=True)),
             ('dropout1', nn.Dropout(0.5)),
             ('fc2', nn.Linear(32, self.args.num_class))
         ]))
