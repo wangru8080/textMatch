@@ -40,7 +40,7 @@ class SiameseCNN(nn.Module):
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear((self.args.filters*2+2)*len(self.args.kernel_size_list), 64)),
-            ('relu1', nn.ReLU(inplace=True))
+            ('relu1', nn.ReLU(inplace=True)),
             ('dropout1', nn.Dropout(0.5)),
             ('fc2', nn.Linear(64, 32)),
             ('relu2', nn.ReLU(inplace=True))
@@ -115,7 +115,7 @@ class TextCNN(nn.Module):
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(self.args.filters, 64)),
-            ('relu1', nn.ReLU(inplace=True))
+            ('relu1', nn.ReLU(inplace=True)),
             ('dropout1', nn.Dropout(0.5)),
             ('fc2', nn.Linear(64, 32)),
             ('dropout2', nn.Dropout(0.5)),
