@@ -120,7 +120,7 @@ class SiameseBertAtt(nn.Module):
 
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(768*16, 128)),
-            ('relu1', nn.ReLU(inplace=True))
+            ('relu1', nn.ReLU(inplace=True)),
             ('dropout1', nn.Dropout(0.5)),
             ('fc2', nn.Linear(128, args.num_class))
         ]))
