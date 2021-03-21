@@ -119,7 +119,7 @@ class TextCNN(nn.Module):
             ('dropout1', nn.Dropout(0.5)),
             ('fc2', nn.Linear(64, 32)),
             ('dropout2', nn.Dropout(0.5)),
-            ('relu2', nn.ReLU(inplace=True))
+            ('relu2', nn.ReLU(inplace=True)),
             ('fc3', nn.Linear(32, self.args.num_class))
         ]))
     
