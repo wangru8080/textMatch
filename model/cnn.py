@@ -10,6 +10,7 @@ import torch.nn as nn
 from torch.nn import functional as F 
 import numpy as np 
 from collections import OrderedDict
+from ..script import EuclideanLayer, CosineLayer, SpatialDropout
 
 '''pair sentence
 '''
