@@ -122,7 +122,9 @@ class TextCNN(nn.Module):
             ('relu2', nn.ReLU(inplace=True)),
             ('fc3', nn.Linear(32, self.args.num_class))
         ]))
-    
+        
+        # self.apply(self.init_weights)
+        
     def forward(self, x):
         x_embedd = self.embedding(x)
         x_embedd = self.spatial_dropout(x_embedd)
@@ -138,3 +140,12 @@ class TextCNN(nn.Module):
         logit = self.fc(out)
         prob = F.softmax(logit, dim=1)
         return logit, prob
+    
+    def init_weights(self, m):
+        if isinstance(m, nn.Embedding):
+            nn.init.uniform_(m.weight) 
+        elif isinstance(m, nn.Conv1d):
+            nn.init.xavier_uniform_(m.weight)
+            nn.init.constant_(m.bias, 0.0)
+        elif isinstance(m, nn.Linear):
+            nn.init.xavier_uniform_(m.weight)
