@@ -11,7 +11,7 @@ from torch.nn import functional as F
 import numpy as np 
 from collections import OrderedDict
 from transformers import BertModel, BertPreTrainedModel
-
+'''
 class BertOrigin(nn.Module):
     def __init__(self, args):
         super(BertOrigin, self).__init__()
@@ -41,6 +41,61 @@ class BertOrigin(nn.Module):
 
         out = self.fc(pooled_output)
         return out
+'''
+
+class BertOrigin(nn.Module):
+    def __init__(self, args, trained=True, pooling_type='first_last_avg'):
+        super(BertOrigin, self).__init__()
+        self.args = args
+        self.pooling_type = pooling_type
+
+        self.bert = BertModel.from_pretrained(args.pretrained_model_path)
+        # 是否对bert进行训练
+        for name, param in self.bert.named_parameters():
+            param.requires_grad = trained
+
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(768, 2))
+        ]))
+
+    def mask_mean(self, x, mask):
+        if mask is not None:
+            mask = mask.unsqueeze(-1)
+            mul_mask = x * mask.float()
+            masked_reduce_mean = torch.sum(mul_mask, dim=1) / torch.sum(mask, dim=1)
+            return masked_reduce_mean
+        else:
+            return torch.mean(x, dim=1)
+
+    def get_pooling(self, bert_out, mask=None):
+        last_encoder_layers = bert_out.last_hidden_state
+        pooled_output = bert_out.pooler_output
+        hidden_states = bert_out.hidden_states
+        embedding_output = hidden_states[0]
+        all_encoder_layers = hidden_states[1:]
+
+        if self.pooling_type == 'pooler':
+            out = pooled_output
+        elif self.pooling_type == 'cls':
+            out = last_encoder_layers[:, 0, :]
+        elif self.pooling_type == 'first_last_avg':
+            out = self.mask_mean(all_encoder_layers[0] + all_encoder_layers[-1], mask)
+        elif self.pooling_type == 'last_avg':
+            out = self.mask_mean(last_encoder_layers, mask)
+        elif self.pooling_type == 'last2avg':
+            out = self.mask_mean(all_encoder_layers[-1] + all_encoder_layers[-2], mask)
+        elif self.pooling_type == 'last4avg':
+            out = self.mask_mean(sum(all_encoder_layers[-1: -5]), mask)
+
+        return out
+
+    def forward(self, input_ids, segment_ids, input_mask):
+        bert_out = self.bert(input_ids=input_ids, attention_mask=input_mask, token_type_ids=segment_ids, output_hidden_states=True)
+        pooled_output = self.get_pooling(bert_out)
+
+        logit = self.fc(pooled_output)
+        prob = F.softmax(logit, dim=1)
+        return logit, prob
 
 class BertCNN(nn.Module):
     def __init__(self, args, trained=True):
