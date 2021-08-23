@@ -44,7 +44,7 @@ class BertOrigin(nn.Module):
 '''
 
 class BertOrigin(nn.Module):
-    def __init__(self, args, trained=True, pooling_type='first_last_avg'):
+    def __init__(self, args, trained=True, pooling_type='cls'):
         super(BertOrigin, self).__init__()
         self.args = args
         self.pooling_type = pooling_type
