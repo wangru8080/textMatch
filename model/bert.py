@@ -68,6 +68,14 @@ class BertOrigin(nn.Module):
             return torch.mean(x, dim=1)
 
     def get_pooling(self, bert_out, mask=None):
+        '''
+        cls: 把encoder的最后一层的[CLS]向量拿出来
+        pooler: 把Pooler（BERT用来做NSP任务）对应的向量拿出来，跟cls的区别是多了个线性变换，相当于cls+dense
+        first_last_avg: 把encoder的第一层与最后一层的所有向量取平均
+        last_avg: 把encoder的最后一层的所有向量取平均
+        last2avg: 把encoder的最后2层的所有向量取平均
+        last4avg: 把encoder的最后4层的所有向量取平均
+        '''
         last_encoder_layers = bert_out.last_hidden_state
         pooled_output = bert_out.pooler_output
         hidden_states = bert_out.hidden_states
