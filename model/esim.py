@@ -65,12 +65,14 @@ class ESIM(nn.Module):
         return torch.cat([rep1, rep2], dim=-1)
     
     def forward(self, x1, x2):
-        x1_embedd = self.embedding(x1)
+        x1_embedd = self.embedding(x1) # [batch, max_len, embedding_size]
         x2_embedd = self.embedding(x2)
 
         # Encoder
-        x1_encoder, _ = self.bi_lstm1(x1_embedd)
-        x2_encoder, _ = self.bi_lstm1(x2_embedd)
+        x1_encoder, _ = self.bi_lstm1(x1_embedd.permute(1, 0, 2)) # x1_encoder: [max_len, batch, lstm_hidden_size]
+        x1_encoder = x1_encoder.permute(1, 0, 2) # [batch, max_len, embedding_size]
+        x2_encoder, _ = self.bi_lstm1(x2_embedd.permute(1, 0, 2))
+        x2_encoder = x2_encoder.permute(1, 0, 2)
 
         # Attention
         x1_align, x2_align = self.soft_align_attention(x1_encoder, x2_encoder)
