@@ -20,8 +20,8 @@ class ESIM(nn.Module):
         if is_pretrain:
             self.embedding = nn.Embedding.from_pretrained(torch.from_numpy(embeddings).float(), freeze=True)
 
-        self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=True, bidirectional=True) # [batch, seq_len, 128]
-        self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=True, bidirectional=True)
+        self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=False, bidirectional=True) # [batch, seq_len, 128]
+        self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=False, bidirectional=True)
         
         self.gap = nn.AdaptiveAvgPool1d(1)
         self.gmp = nn.AdaptiveMaxPool1d(1)
