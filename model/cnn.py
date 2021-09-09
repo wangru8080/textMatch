@@ -142,7 +142,7 @@ class TextCNN(nn.Module):
         return logit, prob
     
     def init_weights(self, m):
-        if isinstance(m, nn.Embedding):
+        if isinstance(m, nn.Embedding) and not self.is_pretrain:
             nn.init.uniform_(m.weight) 
         elif isinstance(m, nn.Conv1d):
             nn.init.xavier_uniform_(m.weight)
