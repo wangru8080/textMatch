@@ -20,8 +20,8 @@ class ESIM(nn.Module):
         if is_pretrain:
             self.embedding = nn.Embedding.from_pretrained(torch.from_numpy(embeddings).float(), freeze=True)
 
-        self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=False, bidirectional=True) # [batch, seq_len, 128]
-        self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=False, bidirectional=True)
+        self.bi_lstm1 = nn.LSTM(self.args.embedding_size, 128, batch_first=True, bidirectional=True) # [batch, seq_len, 128]
+        self.bi_lstm2 = nn.LSTM(128*8, 128, batch_first=True, bidirectional=True)
         
         self.gap = nn.AdaptiveAvgPool1d(1)
         self.gmp = nn.AdaptiveMaxPool1d(1)
@@ -69,10 +69,8 @@ class ESIM(nn.Module):
         x2_embedd = self.embedding(x2)
 
         # Encoder
-        x1_encoder, _ = self.bi_lstm1(x1_embedd.permute(1, 0, 2)) # x1_encoder: [max_len, batch, lstm_hidden_size]
-        x1_encoder = x1_encoder.permute(1, 0, 2) # [batch, max_len, embedding_size]
-        x2_encoder, _ = self.bi_lstm1(x2_embedd.permute(1, 0, 2))
-        x2_encoder = x2_encoder.permute(1, 0, 2)
+        x1_encoder, _ = self.bi_lstm1(x1_embedd) # x1_encoder: [batch, max_len, lstm_hidden_size]
+        x2_encoder, _ = self.bi_lstm1(x2_embedd)
 
         # Attention
         x1_align, x2_align = self.soft_align_attention(x1_encoder, x2_encoder)
