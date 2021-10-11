@@ -61,9 +61,11 @@ class SpatialDropout(nn.Module):
         self.drop_prob = drop_prob
     
     def forward(self, x):
-        x = x.permute(0, 2, 1)
+        x = x.unsqueeze(2)  # (N, maxlen, 1, embed_size)
+        x = x.permute(0, 3, 2, 1)  # (N, embed_size, 1, maxlen)
         x = F.dropout2d(x, self.drop_prob, training=self.training)
-        x = x.permute(0, 2, 1)
+        x = x.permute(0, 3, 2, 1)  # (N, maxlen, 1, embed_size)
+        x = x.squeeze(2)  # (N, maxlen, embed_size)
         return x
     
 class LabelSmoothing(nn.Module):
